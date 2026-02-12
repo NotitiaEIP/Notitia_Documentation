@@ -1,0 +1,232 @@
+.jellyfish-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  pointer-events: none;
+  will-change: transform, opacity;
+  transition: opacity 0.3s ease;
+}
+
+/* Glow effect behind the jellyfish */
+.jellyfish-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(
+    ellipse,
+    rgba(0, 200, 255, 0.3) 0%,
+    rgba(144, 1, 245, 0.2) 30%,
+    rgba(254, 0, 234, 0.1) 50%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: glowPulse 3s ease-in-out infinite;
+  filter: blur(15px);
+}
+
+@keyframes glowPulse {
+  0%, 100% { 
+    opacity: 0.6; 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+  50% { 
+    opacity: 1; 
+    transform: translate(-50%, -50%) scale(1.2); 
+  }
+}
+
+/* ============ GIF ANIMATION ============ */
+.jellyfish-gif {
+  width: 150px;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(0, 200, 255, 0.6))
+          drop-shadow(0 0 40px rgba(100, 180, 255, 0.4));
+  pointer-events: none;
+}
+
+/* ============ CSS FALLBACK JELLYFISH ============ */
+.jellyfish-css {
+  position: relative;
+  width: 140px;
+  height: 200px;
+}
+
+.jelly-body {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 70px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 220, 255, 0.6) 0%,
+    rgba(100, 180, 255, 0.5) 30%,
+    rgba(144, 1, 245, 0.4) 60%,
+    rgba(254, 0, 234, 0.3) 100%
+  );
+  border-radius: 50% 50% 40% 40%;
+  animation: jellyPulse 2s ease-in-out infinite;
+  box-shadow: 
+    0 0 30px rgba(0, 200, 255, 0.5),
+    0 0 60px rgba(144, 1, 245, 0.3),
+    inset 0 -10px 30px rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.jelly-inner {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 60%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50% 50% 40% 40%;
+}
+
+.jelly-shine {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  width: 25px;
+  height: 15px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  filter: blur(3px);
+}
+
+@keyframes jellyPulse {
+  0%, 100% {
+    transform: translateX(-50%) scaleX(1) scaleY(1);
+  }
+  50% {
+    transform: translateX(-50%) scaleX(1.08) scaleY(0.92);
+  }
+}
+
+/* Tentacles */
+.jelly-tentacles {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 130px;
+}
+
+.tentacle {
+  position: absolute;
+  width: 4px;
+  height: 100px;
+  background: linear-gradient(
+    180deg,
+    rgba(100, 200, 255, 0.6) 0%,
+    rgba(144, 1, 245, 0.4) 50%,
+    rgba(254, 0, 234, 0.2) 80%,
+    transparent 100%
+  );
+  border-radius: 0 0 50% 50%;
+  transform-origin: top center;
+  animation: tentacleWave 2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.15s);
+  left: calc(var(--i) * 12px);
+}
+
+.tentacle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 255, 255, 0.6);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+  animation: orbGlow 1.5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.2s);
+}
+
+@keyframes tentacleWave {
+  0%, 100% {
+    transform: rotate(-10deg) scaleY(1);
+  }
+  25% {
+    transform: rotate(15deg) scaleY(0.95);
+  }
+  50% {
+    transform: rotate(-5deg) scaleY(1.05);
+  }
+  75% {
+    transform: rotate(10deg) scaleY(0.98);
+  }
+}
+
+/* Floating orbs inside body */
+.jelly-orbs {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 50px;
+}
+
+.orb {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(0, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: orbFloat 3s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.4s);
+  left: calc(10px + var(--i) * 15px);
+  top: calc(10px + var(--i) * 5px);
+}
+
+@keyframes orbFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes orbGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.3);
+  }
+}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion: reduce) {
+  .jellyfish-sprite,
+  .jelly-body,
+  .tentacle,
+  .orb,
+  .jellyfish-glow {
+    animation: none;
+  }
+}

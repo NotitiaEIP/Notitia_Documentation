@@ -1,0 +1,590 @@
+.ocean-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  --scroll-depth: 0;
+}
+
+.ocean-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ============ SKY LAYER ============ */
+.sky-layer {
+  background: linear-gradient(
+    180deg,
+    #1a0a2e 0%,
+    #2d1b4e 15%,
+    #4a2c7a 30%,
+    #6b3fa0 45%,
+    #ff7e5f 60%,
+    #feb47b 75%,
+    #ffe5b4 90%,
+    #fff9e6 100%
+  );
+  opacity: calc(1 - var(--scroll-depth) * 0.6);
+  transition: opacity 0.5s ease;
+}
+
+/* ============ CLOUDS ============ */
+.clouds {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  width: 100%;
+  height: 20%;
+  opacity: calc(1 - var(--scroll-depth) * 3);
+}
+
+.cloud {
+  position: absolute;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 233, 210, 0.7) 100%
+  );
+  border-radius: 50%;
+  filter: blur(10px);
+  animation: cloudDrift linear infinite;
+}
+
+.cloud-1 {
+  top: 20%;
+  left: -20%;
+  width: 200px;
+  height: 60px;
+  animation-duration: 60s;
+}
+
+.cloud-1::before,
+.cloud-1::after {
+  content: '';
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.cloud-1::before {
+  width: 80px;
+  height: 80px;
+  top: -30px;
+  left: 30px;
+}
+
+.cloud-1::after {
+  width: 100px;
+  height: 60px;
+  top: -20px;
+  left: 80px;
+}
+
+.cloud-2 {
+  top: 10%;
+  left: -30%;
+  width: 180px;
+  height: 50px;
+  animation-duration: 80s;
+  animation-delay: -20s;
+  opacity: 0.7;
+}
+
+.cloud-3 {
+  top: 30%;
+  left: -15%;
+  width: 150px;
+  height: 40px;
+  animation-duration: 70s;
+  animation-delay: -40s;
+  opacity: 0.5;
+}
+
+@keyframes cloudDrift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(100vw + 300px)); }
+}
+
+/* ============ SUN ============ */
+.sun-layer {
+  opacity: calc(1 - var(--scroll-depth) * 2);
+  transition: opacity 0.5s ease;
+}
+
+.sun {
+  position: absolute;
+  top: 8%;
+  right: 15%;
+  width: 200px;
+  height: 200px;
+}
+
+.sun-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(
+    circle,
+    #ffffff 0%,
+    #fff9e6 30%,
+    #ffe066 60%,
+    #ffb347 80%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  box-shadow: 
+    0 0 40px #fff9e6,
+    0 0 80px #ffe066,
+    0 0 120px rgba(255, 180, 71, 0.5);
+}
+
+.sun-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 224, 102, 0.4) 0%,
+    rgba(255, 180, 71, 0.2) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: sunPulse 4s ease-in-out infinite;
+}
+
+.sun-outer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 224, 102, 0.2) 0%,
+    rgba(255, 126, 95, 0.1) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: sunPulse 6s ease-in-out infinite reverse;
+}
+
+.sun-rays-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+}
+
+.sun-ray {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 100px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 224, 102, 0.6) 0%,
+    rgba(255, 180, 71, 0.3) 50%,
+    transparent 100%
+  );
+  transform-origin: center top;
+  animation: rayRotate 30s linear infinite;
+}
+
+.sun-flare {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 224, 102, 0.15) 0%,
+    transparent 70%
+  );
+  animation: flarePulse 8s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.8; }
+}
+
+@keyframes rayRotate {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.4; }
+}
+
+@keyframes flarePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.3; }
+}
+
+/* ============ WATER SURFACE ============ */
+.surface-layer {
+  top: auto;
+  bottom: calc(100% - 35% - var(--scroll-depth) * 30%);
+  height: 150px;
+  transition: bottom 0.3s ease;
+}
+
+.water-surface {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
+}
+
+.waves {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 120px;
+  animation: waveSlide 15s linear infinite;
+}
+
+.wave {
+  fill: rgba(1, 0, 142, 0.6);
+}
+
+.wave-1 {
+  fill: rgba(46, 139, 192, 0.5);
+  animation: wave1Move 10s ease-in-out infinite;
+}
+
+.wave-2 {
+  fill: rgba(1, 0, 142, 0.6);
+  animation: wave2Move 12s ease-in-out infinite;
+}
+
+.wave-3 {
+  fill: rgba(0, 0, 63, 0.7);
+  animation: wave3Move 8s ease-in-out infinite;
+}
+
+@keyframes waveSlide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes wave1Move {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes wave2Move {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes wave3Move {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.surface-reflection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(135, 206, 235, 0.2) 30%,
+    transparent 100%
+  );
+  animation: reflectionShimmer 5s ease-in-out infinite;
+}
+
+@keyframes reflectionShimmer {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+/* ============ UNDERWATER GRADIENT ============ */
+.underwater-gradient {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(46, 139, 192, 0.3) 10%,
+    rgba(1, 0, 142, 0.5) 30%,
+    rgba(0, 0, 63, 0.7) 50%,
+    rgba(10, 10, 40, 0.85) 70%,
+    rgba(5, 5, 25, 0.95) 85%,
+    #020210 100%
+  );
+  opacity: calc(var(--scroll-depth) * 1.2);
+  transition: opacity 0.3s ease;
+}
+
+/* ============ LIGHT RAYS ============ */
+.rays-layer {
+  opacity: calc((1 - var(--scroll-depth) * 0.8));
+  transition: opacity 0.5s ease;
+}
+
+.light-ray {
+  position: absolute;
+  top: 25%;
+  height: 75%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(135, 206, 235, 0.12) 20%,
+    rgba(46, 139, 192, 0.08) 40%,
+    rgba(1, 0, 142, 0.04) 60%,
+    transparent 100%
+  );
+  clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+  animation: rayShimmer 8s ease-in-out infinite;
+  transform-origin: top center;
+  filter: blur(2px);
+}
+
+@keyframes rayShimmer {
+  0%, 100% { opacity: 0.4; transform: scaleX(1) skewX(-3deg); }
+  50% { opacity: 1; transform: scaleX(1.2) skewX(3deg); }
+}
+
+/* ============ CAUSTICS ============ */
+.caustics-layer {
+  opacity: calc(0.15 - var(--scroll-depth) * 0.1);
+  mix-blend-mode: overlay;
+}
+
+.caustics {
+  position: absolute;
+  top: 35%;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: 
+    repeating-conic-gradient(
+      from 0deg,
+      transparent 0deg 10deg,
+      rgba(255, 255, 255, 0.05) 10deg 20deg
+    );
+  background-size: 100px 100px;
+  animation: causticsMove 25s linear infinite, causticsWave 8s ease-in-out infinite;
+  filter: blur(8px);
+}
+
+@keyframes causticsMove {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(100px) translateY(50px); }
+}
+
+@keyframes causticsWave {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* ============ FISH SILHOUETTES ============ */
+.fish-layer {
+  opacity: calc(0.3 + var(--scroll-depth) * 0.5);
+}
+
+.fish-silhouette {
+  position: absolute;
+  left: -30px;
+  background: rgba(0, 0, 30, 0.4);
+  clip-path: polygon(0% 50%, 25% 20%, 75% 20%, 100% 50%, 75% 80%, 25% 80%);
+  animation: fishSwim linear infinite;
+  filter: blur(1px);
+}
+
+@keyframes fishSwim {
+  0% { transform: translateX(-30px) translateY(0); }
+  25% { transform: translateX(25vw) translateY(-20px); }
+  50% { transform: translateX(50vw) translateY(10px); }
+  75% { transform: translateX(75vw) translateY(-15px); }
+  100% { transform: translateX(calc(100vw + 30px)) translateY(0); }
+}
+
+/* ============ BUBBLES ============ */
+.bubbles-layer {
+  opacity: calc(0.5 + var(--scroll-depth) * 0.3);
+}
+
+.bubble {
+  position: absolute;
+  bottom: -30px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(135, 206, 235, 0.5) 30%,
+    rgba(144, 1, 245, 0.3) 60%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: bubbleRise linear infinite;
+  box-shadow: 
+    inset 0 0 10px rgba(255, 255, 255, 0.5),
+    0 0 5px rgba(135, 206, 235, 0.3);
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 30%;
+  height: 20%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+    transform: translateY(-10vh) translateX(5px) scale(0.7);
+  }
+  50% {
+    transform: translateY(-50vh) translateX(-10px) scale(0.9);
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(15px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* ============ BIOLUMINESCENT PARTICLES ============ */
+.particles-layer {
+  opacity: calc(0.2 + var(--scroll-depth) * 0.8);
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: particleFloat ease-in-out infinite;
+}
+
+.particle-cyan {
+  background: radial-gradient(
+    circle,
+    rgba(0, 255, 255, 0.9) 0%,
+    rgba(0, 200, 255, 0.5) 40%,
+    transparent 100%
+  );
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+}
+
+.particle-purple {
+  background: radial-gradient(
+    circle,
+    rgba(144, 1, 245, 0.9) 0%,
+    rgba(254, 0, 234, 0.5) 40%,
+    transparent 100%
+  );
+  box-shadow: 0 0 10px rgba(144, 1, 245, 0.6);
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(15px, -30px) scale(1.3);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-10px, -15px) scale(0.8);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(20px, 20px) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* ============ DEPTH VIGNETTE ============ */
+.depth-vignette {
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 30, 0.3) 80%,
+    rgba(0, 0, 20, 0.6) 100%
+  );
+  opacity: calc(0.5 + var(--scroll-depth) * 0.5);
+}
+
+/* ============ SEABED ============ */
+.seabed-layer {
+  top: auto;
+  bottom: 0;
+  height: 200px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 30, 0.4) 30%,
+    rgba(10, 5, 25, 0.7) 60%,
+    rgba(5, 2, 15, 0.9) 100%
+  );
+  opacity: calc(var(--scroll-depth) * 1.5);
+  transition: opacity 0.3s ease;
+}
+
+.seabed-layer::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: 
+    radial-gradient(ellipse 80px 40px at 10% 100%, rgba(144, 1, 245, 0.3) 0%, transparent 100%),
+    radial-gradient(ellipse 100px 50px at 30% 100%, rgba(254, 0, 234, 0.2) 0%, transparent 100%),
+    radial-gradient(ellipse 60px 30px at 50% 100%, rgba(0, 255, 255, 0.3) 0%, transparent 100%),
+    radial-gradient(ellipse 90px 45px at 70% 100%, rgba(144, 1, 245, 0.25) 0%, transparent 100%),
+    radial-gradient(ellipse 70px 35px at 90% 100%, rgba(255, 1, 120, 0.2) 0%, transparent 100%);
+  animation: seabedGlow 10s ease-in-out infinite;
+}
+
+@keyframes seabedGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion: reduce) {
+  .sun-core,
+  .sun-rays,
+  .water-surface,
+  .light-ray,
+  .bubble,
+  .particle,
+  .ocean-caustics {
+    animation: none;
+  }
+}
