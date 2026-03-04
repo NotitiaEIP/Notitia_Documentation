@@ -7,6 +7,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const isHome = location.pathname === '/'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -18,6 +19,14 @@ export default function Navbar() {
     setMenuOpen(false)
   }, [location])
 
+  const scrollTo = (id) => {
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
+      setMenuOpen(false)
+    }
+  }
+
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="navbar-inner">
@@ -27,17 +36,38 @@ export default function Navbar() {
         </Link>
 
         <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
-          <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
-            Accueil
-          </Link>
-          <Link to="/docs" className={location.pathname.startsWith('/docs') ? 'active' : ''}>
+          {isHome ? (
+            <>
+              <button onClick={() => scrollTo('about')} className="nav-link-btn">
+                Comprendre
+              </button>
+              <button onClick={() => scrollTo('how-it-works')} className="nav-link-btn">
+                Fonctionnement
+              </button>
+              <button onClick={() => scrollTo('advantage')} className="nav-link-btn">
+                Avantages
+              </button>
+              <button onClick={() => scrollTo('industries')} className="nav-link-btn">
+                Cas d'usage
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/">Accueil</Link>
+            </>
+          )}
+          <Link
+            to="/docs"
+            className={location.pathname.startsWith('/docs') ? 'active' : ''}
+          >
             Documentation
           </Link>
           <a href="https://github.com" target="_blank" rel="noopener noreferrer">
             GitHub
           </a>
           <Link to="/docs" className="navbar-cta">
-            Démarrer →
+            Démarrer
+            <span className="cta-arrow">→</span>
           </Link>
         </div>
 
