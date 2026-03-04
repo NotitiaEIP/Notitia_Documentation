@@ -13,7 +13,7 @@ const CAMERA_END_Y = -DEPTH_RANGE + 5
 /* ─── JELLYFISH MODEL ─── */
 function JellyfishModel({ scrollProgress = 0 }) {
   const groupRef = useRef()
-  const obj = useLoader(OBJLoader, '/models/jellyfish.obj')
+  const obj = useLoader(OBJLoader, '/models/Jellyfish1.obj')
   const mouseRef = useRef({ x: 0, y: 0 })
   const meshesRef = useRef([])
   const originalPositionsRef = useRef([])
