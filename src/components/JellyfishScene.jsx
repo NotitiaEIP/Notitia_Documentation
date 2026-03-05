@@ -11,13 +11,19 @@ const CAMERA_START_Y = 2
 const CAMERA_END_Y = -DEPTH_RANGE + 5
 
 /* ─── JELLYFISH MODEL ─── */
-function JellyfishModel({ scrollProgress = 0 }) {
+function JellyfishModel({ scrollProgress = 0, motionRef = null }) {
   const groupRef = useRef()
   const obj = useLoader(OBJLoader, '/models/Jellyfish1.obj')
   const mouseRef = useRef({ x: 0, y: 0 })
   const meshesRef = useRef([])
   const originalPositionsRef = useRef([])
-  const scrollTiltRef = useRef(0)
+  const directionTiltRef = useRef(0)
+  const prevScrollProgressRef = useRef(scrollProgress)
+  const swimDirectionRef = useRef(1)
+  const prevPositionRef = useRef(new THREE.Vector3(0, 2, 0))
+  const frameVelocityRef = useRef(new THREE.Vector3())
+  const coreLightRef = useRef()
+  const rimLightRef = useRef()
 
   const scene = useMemo(() => {
     const cloned = obj.clone()
@@ -75,26 +81,36 @@ function JellyfishModel({ scrollProgress = 0 }) {
       mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1
       mouseRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1
     }
-    const onWheel = (e) => {
-      // deltaY > 0 = scroll down, deltaY < 0 = scroll up
-      // Scroll UP → head UP (positive tilt)
-      // Scroll DOWN → head DOWN (negative tilt)
-      const impulse = THREE.MathUtils.clamp(-e.deltaY * 0.008, -1, 1)
-      scrollTiltRef.current = THREE.MathUtils.clamp(
-        scrollTiltRef.current + impulse, -0.8, 0.8
-      )
-    }
     window.addEventListener('mousemove', onMouseMove)
-    window.addEventListener('wheel', onWheel, { passive: true })
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('wheel', onWheel)
     }
   }, [])
 
   useFrame((state) => {
     if (!groupRef.current) return
     const t = state.clock.getElapsedTime()
+
+    // ── Scroll direction: down => head down, up => head up ──
+    const scrollDelta = scrollProgress - prevScrollProgressRef.current
+    prevScrollProgressRef.current = scrollProgress
+    const scrollVelocity = THREE.MathUtils.clamp(scrollDelta * 300, -1, 1)
+    const deadZone = 0.04
+
+    // Keep previous direction while user is not scrolling enough
+    if (scrollVelocity > deadZone) {
+      swimDirectionRef.current = 1
+    } else if (scrollVelocity < -deadZone) {
+      swimDirectionRef.current = -1
+    }
+
+    // Direction is sticky: down stays down until an up-scroll is detected
+    const targetDirectionTilt = swimDirectionRef.current * (Math.PI / 2.8)
+    directionTiltRef.current = THREE.MathUtils.lerp(
+      directionTiltRef.current,
+      targetDirectionTilt,
+      0.2
+    )
 
     // ── Swim cycle: a rhythmic contraction (0→1→0) ──
     // Fast contraction, slow expansion — like a real jellyfish
@@ -143,19 +159,19 @@ function JellyfishModel({ scrollProgress = 0 }) {
           const tentacleFactor = 1 - normalizedY / 0.4 // 0 at middle, 1 at bottom
 
           // During contraction, tentacles spread outward and trail
-          const spread = contraction * tentacleFactor * 0.3
+          const spread = contraction * tentacleFactor * 0.5
           const angle = Math.atan2(oz, ox)
           nx = ox + Math.cos(angle) * spread * dist * 0.4
           nz = oz + Math.sin(angle) * spread * dist * 0.4
 
           // Tentacles wave with organic undulation
-          const wave = Math.sin(t * 0.8 + tentacleFactor * 4 + dist * 2) * tentacleFactor * 0.12
-          const wave2 = Math.cos(t * 0.6 + tentacleFactor * 3) * tentacleFactor * 0.08
+          const wave = Math.sin(t * 1.2 + tentacleFactor * 4 + dist * 2.4) * tentacleFactor * 0.2
+          const wave2 = Math.cos(t * 0.95 + tentacleFactor * 3.4) * tentacleFactor * 0.14
           nx += wave
           nz += wave2
 
           // Tentacles drag downward during expansion (relaxation)
-          ny = oy - (1 - contraction) * tentacleFactor * 0.1
+          ny = oy - (1 - contraction) * tentacleFactor * 0.16
         }
 
         posAttr.array[i * 3] = nx
@@ -185,10 +201,10 @@ function JellyfishModel({ scrollProgress = 0 }) {
       groupRef.current.position.z, Math.cos(t * 0.14) * 0.6 + Math.sin(t * 0.09) * 0.3, 0.02
     )
 
-    // ── Head tilt based on scroll POSITION ──
-    // Top of page (scrollProgress=0) → head UP (+45°)
-    // Bottom of page (scrollProgress=1) → head DOWN (-45°)
-    const scrollTilt = (1 - scrollProgress * 2) * Math.PI / 4
+    // Frame velocity for reactive particle trail
+    const frameVelocity = frameVelocityRef.current
+    frameVelocity.subVectors(groupRef.current.position, prevPositionRef.current)
+    prevPositionRef.current.copy(groupRef.current.position)
 
     // Lean into the zigzag direction (derivative of zigzag for banking)
     const zigzagVel = Math.cos(t * 0.18) * 0.18 * 1.8 + Math.cos(t * 0.07) * 0.07 * 0.8
@@ -199,76 +215,175 @@ function JellyfishModel({ scrollProgress = 0 }) {
     const mouseInfluenceX = mouseRef.current.y * 0.03
     const mouseInfluenceY = mouseRef.current.x * 0.06
 
+    const baseDirectionOffset = Math.PI / 2 // +90°
+
     groupRef.current.rotation.x = THREE.MathUtils.lerp(
-      groupRef.current.rotation.x, scrollTilt + wobbleX + mouseInfluenceX, 0.15
+      groupRef.current.rotation.x,
+      baseDirectionOffset + directionTiltRef.current + wobbleX + mouseInfluenceX,
+      0.22
     )
     groupRef.current.rotation.y += (mouseInfluenceY + Math.sin(t * 0.25) * 0.1 - groupRef.current.rotation.y) * 0.02
     groupRef.current.rotation.z = THREE.MathUtils.lerp(
       groupRef.current.rotation.z, -bankAngle + wobbleZ, 0.03
     )
 
-    // Overall scale pulse synced with swim — bigger scale (1.3)
+    // Overall scale pulse synced with swim — bigger scale (1.7)
     const pulse = 1 + contraction * 0.04
-    groupRef.current.scale.setScalar(1.3 * pulse)
+    groupRef.current.scale.setScalar(1.7 * pulse)
+
+    // Bioluminescent pulse synced with contraction
+    if (coreLightRef.current) {
+      coreLightRef.current.intensity = 1.8 + contraction * 2.2
+      coreLightRef.current.distance = 8 + contraction * 3
+    }
+    if (rimLightRef.current) {
+      rimLightRef.current.intensity = 0.6 + contraction * 1.2
+      rimLightRef.current.distance = 5 + contraction * 2
+    }
+
+    // Expose motion data for particle system
+    if (motionRef?.current) {
+      motionRef.current.position.copy(groupRef.current.position)
+      motionRef.current.velocity.copy(frameVelocity)
+      motionRef.current.contraction = contraction
+      motionRef.current.scrollVelocity = scrollVelocity
+    }
   })
 
   return (
-    <group ref={groupRef} scale={1.3} position={[0, 2, 0]}>
+    <group ref={groupRef} scale={1.7} position={[0, 2, 0]}>
       <primitive object={scene} />
       {/* Bioluminescent glow around jellyfish */}
-      <pointLight color="#7040ff" intensity={2} distance={8} decay={2} />
-      <pointLight color="#ff40c0" intensity={0.8} distance={5} decay={2} position={[0, -0.5, 0]} />
+      <pointLight ref={coreLightRef} color="#7040ff" intensity={2} distance={8} decay={2} />
+      <pointLight ref={rimLightRef} color="#ff40c0" intensity={0.8} distance={5} decay={2} position={[0, -0.5, 0]} />
     </group>
   )
 }
 
-/* ─── FLOATING PARTICLES (plankton/bioluminescence) ─── */
-function Particles({ count = 400 }) {
-  const meshRef = useRef()
-  const { positions, colors } = useMemo(() => {
-    const pos = new Float32Array(count * 3)
-    const col = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 25
-      pos[i * 3 + 1] = -Math.random() * DEPTH_RANGE * 1.2
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 15
-      const r = Math.random()
-      if (r < 0.33) {
-        col[i * 3] = 0.3; col[i * 3 + 1] = 0.8; col[i * 3 + 2] = 1
-      } else if (r < 0.66) {
-        col[i * 3] = 0.6; col[i * 3 + 1] = 0.3; col[i * 3 + 2] = 1
+/* ─── REACTIVE BIOLUMINESCENT TRAIL ───
+   Particles stay where spawned, then fade out.
+   Emission increases while scrolling and during jellyfish pulse. */
+function Particles({ maxCount = 360, motionRef }) {
+  const pointsRef = useRef()
+  const writeIndexRef = useRef(0)
+  const emitCarryRef = useRef(0)
+  const defaultPositionRef = useRef(new THREE.Vector3(0, 0, 0))
+  const defaultVelocityRef = useRef(new THREE.Vector3(0, 0, 0))
+
+  const positions = useMemo(() => new Float32Array(maxCount * 3), [maxCount])
+  const colors = useMemo(() => new Float32Array(maxCount * 3), [maxCount])
+
+  const particlesRef = useRef(
+    Array.from({ length: maxCount }, () => ({
+      life: 0,
+      maxLife: 1,
+      tint: 0,
+    }))
+  )
+
+  const spawnParticle = (scrollBoost, pulseBoost) => {
+    const idx = writeIndexRef.current
+    writeIndexRef.current = (writeIndexRef.current + 1) % maxCount
+
+    const p = particlesRef.current[idx]
+    const basePos = motionRef?.current?.position || defaultPositionRef.current
+    const velocity = motionRef?.current?.velocity || defaultVelocityRef.current
+
+    const velLen = velocity.length()
+    const dirX = velLen > 0.0001 ? velocity.x / velLen : 0
+    const dirY = velLen > 0.0001 ? velocity.y / velLen : -1
+    const dirZ = velLen > 0.0001 ? velocity.z / velLen : 0
+
+    // Spawn slightly behind the motion direction for a subtle trail
+    const behind = 0.18 + Math.random() * 0.55
+    const jitter = 0.22
+
+    positions[idx * 3] = basePos.x - dirX * behind + (Math.random() - 0.5) * jitter
+    positions[idx * 3 + 1] = basePos.y - dirY * behind + (Math.random() - 0.5) * jitter
+    positions[idx * 3 + 2] = basePos.z - dirZ * behind + (Math.random() - 0.5) * jitter
+
+    p.tint = Math.random()
+
+    p.maxLife = 0.9 + Math.random() * 0.8
+    p.life = p.maxLife
+
+    // Small instant brightness on spawn
+    const seed = THREE.MathUtils.clamp(0.2 + scrollBoost * 0.25 + pulseBoost * 0.18, 0.12, 0.65)
+    if (p.tint < 0.55) {
+      colors[idx * 3] = 0.45 * seed
+      colors[idx * 3 + 1] = 0.62 * seed
+      colors[idx * 3 + 2] = 1 * seed
+    } else {
+      colors[idx * 3] = 0.72 * seed
+      colors[idx * 3 + 1] = 0.38 * seed
+      colors[idx * 3 + 2] = 1 * seed
+    }
+  }
+
+  useFrame((_, delta) => {
+    if (!pointsRef.current) return
+
+    const contraction = motionRef?.current?.contraction || 0
+    const scrollSpeed = Math.abs(motionRef?.current?.scrollVelocity || 0)
+
+    // Light baseline + stronger while scrolling
+    const emissionRate = 2.2 + scrollSpeed * 16 + contraction * 3.2
+    emitCarryRef.current += emissionRate * delta
+    const emitNow = Math.min(Math.floor(emitCarryRef.current), 12)
+    emitCarryRef.current -= emitNow
+
+    for (let i = 0; i < emitNow; i++) {
+      spawnParticle(scrollSpeed, contraction)
+    }
+
+    for (let i = 0; i < maxCount; i++) {
+      const p = particlesRef.current[i]
+      if (p.life <= 0) {
+        colors[i * 3] = 0
+        colors[i * 3 + 1] = 0
+        colors[i * 3 + 2] = 0
+        continue
+      }
+
+      p.life -= delta
+      if (p.life <= 0) {
+        colors[i * 3] = 0
+        colors[i * 3 + 1] = 0
+        colors[i * 3 + 2] = 0
       } else {
-        col[i * 3] = 1; col[i * 3 + 1] = 1; col[i * 3 + 2] = 1
+        const k = p.life / p.maxLife
+        const intensity = (k * k) * (0.5 + scrollSpeed * 0.45 + contraction * 0.3)
+        if (p.tint < 0.55) {
+          colors[i * 3] = 0.45 * intensity
+          colors[i * 3 + 1] = 0.62 * intensity
+          colors[i * 3 + 2] = 1 * intensity
+        } else {
+          colors[i * 3] = 0.72 * intensity
+          colors[i * 3 + 1] = 0.38 * intensity
+          colors[i * 3 + 2] = 1 * intensity
+        }
       }
     }
-    return { positions: pos, colors: col }
-  }, [count])
 
-  useFrame((state) => {
-    if (!meshRef.current) return
-    const t = state.clock.getElapsedTime()
-    const posArr = meshRef.current.geometry.attributes.position.array
-    for (let i = 0; i < count; i++) {
-      posArr[i * 3] += Math.sin(t * 0.08 + i) * 0.0003
-      posArr[i * 3 + 1] += Math.sin(t * 0.05 + i * 0.5) * 0.0002
-    }
-    meshRef.current.geometry.attributes.position.needsUpdate = true
+    const geometry = pointsRef.current.geometry
+    geometry.attributes.position.needsUpdate = true
+    geometry.attributes.color.needsUpdate = true
   })
 
   return (
-    <points ref={meshRef}>
+    <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-color" count={count} array={colors} itemSize={3} />
+        <bufferAttribute attach="attributes-position" count={maxCount} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-color" count={maxCount} array={colors} itemSize={3} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.04}
+        size={0.06}
         vertexColors
         transparent
-        opacity={0.7}
+        opacity={0.9}
         sizeAttenuation
-        blending={THREE.AdditiveBlending}
         depthWrite={false}
+        blending={THREE.AdditiveBlending}
       />
     </points>
   )
@@ -321,44 +436,36 @@ function Bubbles({ count = 80 }) {
   )
 }
 
-/* ─── LIGHT RAYS from surface ─── */
-function LightRays() {
+/* ─── ATMOSPHERIC MIST LAYERS ─── */
+function MistLayers({ scrollProgress }) {
   const groupRef = useRef()
-  const rays = useMemo(() => {
-    const arr = []
-    for (let i = 0; i < 6; i++) {
-      const x = (Math.random() - 0.5) * 16
-      const z = (Math.random() - 0.5) * 8
-      arr.push({ x, z, width: Math.random() * 0.8 + 0.3, height: 30 + Math.random() * 20 })
-    }
-    return arr
-  }, [])
 
   useFrame((state) => {
     if (!groupRef.current) return
     const t = state.clock.getElapsedTime()
+
     groupRef.current.children.forEach((child, i) => {
-      if (child.material) {
-        child.material.opacity = 0.03 + Math.sin(t * 0.08 + i * 2) * 0.015
-      }
+      child.position.x = Math.sin(t * 0.05 + i * 2.2) * (1.2 + i * 0.2)
+      child.position.z = Math.cos(t * 0.04 + i * 1.4) * (0.4 + i * 0.12)
+      child.material.opacity = 0.035 + Math.sin(t * 0.12 + i) * 0.01 - scrollProgress * 0.01
+      child.rotation.z = Math.sin(t * 0.03 + i) * 0.12
     })
   })
 
   return (
-    <group ref={groupRef} position={[0, 5, 0]}>
-      {rays.map((ray, i) => (
-        <mesh key={i} position={[ray.x, -ray.height / 2, ray.z]} rotation={[0, 0, (Math.random() - 0.5) * 0.15]}>
-          <planeGeometry args={[ray.width, ray.height]} />
-          <meshBasicMaterial
-            color="#6090ff"
-            transparent
-            opacity={0.04}
-            side={THREE.DoubleSide}
-            blending={THREE.AdditiveBlending}
-            depthWrite={false}
-          />
-        </mesh>
-      ))}
+    <group ref={groupRef} position={[0, -8, -6]}>
+      <mesh position={[0, 0, 0]}>
+        <planeGeometry args={[28, 12]} />
+        <meshBasicMaterial color="#6a6bff" transparent opacity={0.04} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh position={[0, -6, -0.4]}>
+        <planeGeometry args={[32, 14]} />
+        <meshBasicMaterial color="#5a44ff" transparent opacity={0.03} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh position={[0, -12, -0.8]}>
+        <planeGeometry args={[38, 16]} />
+        <meshBasicMaterial color="#3a3d9a" transparent opacity={0.025} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
     </group>
   )
 }
@@ -521,6 +628,13 @@ function DepthLights({ scrollProgress }) {
 
 /* ─── MAIN SCENE ─── */
 function Scene({ scrollProgress }) {
+  const jellyfishMotionRef = useRef({
+    position: new THREE.Vector3(0, 2, 0),
+    velocity: new THREE.Vector3(0, 0, 0),
+    contraction: 0,
+    scrollVelocity: 0,
+  })
+
   return (
     <>
       <DepthDarkening scrollProgress={scrollProgress} />
@@ -528,8 +642,9 @@ function Scene({ scrollProgress }) {
       <CameraController scrollProgress={scrollProgress} />
       <fog attach="fog" args={['#050520', 8, 30]} />
 
-      <JellyfishModel scrollProgress={scrollProgress} />
-      <Particles />
+      <JellyfishModel scrollProgress={scrollProgress} motionRef={jellyfishMotionRef} />
+      <MistLayers scrollProgress={scrollProgress} />
+      <Particles motionRef={jellyfishMotionRef} />
       <Bubbles />
       <SeaweedCluster />
       <Rocks />
@@ -568,6 +683,8 @@ export default function JellyfishScene({ scrollProgress = 0 }) {
         className="depth-overlay"
         style={{ opacity: scrollProgress * 0.6 }}
       />
+      <div className="surface-glow" style={{ opacity: 1 - scrollProgress * 0.5 }} />
+      <div className="edge-vignette" style={{ opacity: 0.55 + scrollProgress * 0.2 }} />
     </div>
   )
 }
