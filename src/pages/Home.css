@@ -8,7 +8,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #050520;
+  background: var(--surface-solid);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,14 +26,14 @@
   grid-template-rows: repeat(12, 1fr);
 }
 .loading-block {
-  background: #0a0a2a;
+  background: var(--surface-deep);
   border: 0.5px solid rgba(100, 60, 200, 0.08);
   transition: opacity 0.5s ease;
   animation: loadBlockPulse 2s ease infinite;
 }
 @keyframes loadBlockPulse {
-  0%, 100% { background: #0a0a2a; }
-  50% { background: #0e0e35; }
+  0%, 100% { background: var(--surface-deep); }
+  50% { background: var(--surface-deeper); }
 }
 .loading-center {
   position: absolute;
@@ -47,7 +47,7 @@
   width: 60px;
   height: 60px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #6a3de8, #9060ff, #ff40c0);
+  background: linear-gradient(135deg, var(--brand-ui-1), var(--brand-ui-2), var(--brand-ui-3));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -124,7 +124,7 @@
 }
 .supertitle-tag {
   background: white;
-  color: #050520;
+  color: var(--hero-tag-text);
   padding: 2px 12px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -213,15 +213,15 @@
   flex-shrink: 0;
 }
 .btn-solais.primary .btn-edge.left {
-  background: #6a3de8;
+  background: var(--brand-ui-1);
   clip-path: polygon(100% 0, 100% 100%, 0 100%, 40% 0);
 }
 .btn-solais.primary .btn-edge.right {
-  background: #6a3de8;
+  background: var(--brand-ui-1);
   clip-path: polygon(0 0, 0 100%, 60% 100%, 100% 0);
 }
 .btn-solais.primary .btn-inner {
-  background: #6a3de8;
+  background: var(--brand-ui-1);
   height: 100%;
   display: flex;
   align-items: center;
@@ -266,7 +266,7 @@
   margin-bottom: 1.5rem;
 }
 .label-tag {
-  background: #6a3de8;
+  background: var(--brand-ui-1);
   color: white;
   padding: 2px 12px;
   font-size: 0.72rem;
@@ -279,13 +279,13 @@
   display: inline-block;
   width: 8px;
   height: 28px;
-  background: #6a3de8;
+  background: var(--brand-ui-1);
 }
 .label-bar-2 {
   display: inline-block;
   width: 4px;
   height: 28px;
-  background: #6a3de8;
+  background: var(--brand-ui-1);
 }
 
 /* ─── BLINK INDICATOR ─── */
@@ -431,14 +431,14 @@
   height: 28px;
   align-items: center;
   justify-content: center;
-  border: 2px solid #6a3de8;
-  color: #6a3de8;
+  border: 2px solid var(--brand-ui-1);
+  color: var(--brand-ui-1);
   font-size: 0.7rem;
   font-weight: 700;
   margin-right: -1px;
 }
 .step-tag {
-  background: #6a3de8;
+  background: var(--brand-ui-1);
   color: white;
   padding: 2px 12px;
   font-size: 0.72rem;
@@ -545,11 +545,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9060ff;
+  color: var(--brand-ui-2);
   transition: all 0.3s ease;
 }
 .arch-node-solais:hover .arch-icon {
-  border-color: #9060ff;
+  border-color: var(--brand-ui-2);
   background: rgba(106, 61, 232, 0.1);
   box-shadow: 0 0 20px rgba(106, 61, 232, 0.3);
 }
@@ -609,7 +609,7 @@
 }
 .use-case-card {
   background: white;
-  color: #050520;
+  color: var(--hero-tag-text);
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -714,7 +714,7 @@
   font-size: 3rem;
   font-weight: 900;
   line-height: 1;
-  background: linear-gradient(135deg, #6a3de8, #ff40c0);
+  background: linear-gradient(135deg, var(--brand-ui-1), var(--brand-ui-3));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

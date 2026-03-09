@@ -15,6 +15,7 @@ import {
   HiOutlineLockClosed,
 } from 'react-icons/hi'
 import JellyfishScene from '../components/JellyfishScene'
+import { loadHomeContent } from '../utils/contentCustomization'
 import './Home.css'
 
 /* ─── loading screen ─── */
@@ -156,6 +157,7 @@ function Marquee() {
 
 /* ─── MAIN COMPONENT ─── */
 export default function Home() {
+  const homeContent = loadHomeContent()
   const [loaded, setLoaded] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const containerRef = useRef(null)
@@ -203,33 +205,34 @@ export default function Home() {
           variants={stagger}
         >
           <motion.span className="hero-supertitle" variants={fadeUp} custom={0}>
-            <span className="supertitle-tag">Mémoire Augmentée</span>
+            <span className="supertitle-tag">{homeContent.heroSupertitle}</span>
             <span className="supertitle-bar-1" />
             <span className="supertitle-bar-2" />
           </motion.span>
 
           <motion.h1 className="hero-title" variants={fadeUp} custom={1}>
-            <span>LIBÉREZ VOTRE</span>
+            <span>{homeContent.heroTitleLine1}</span>
             <span className="title-row">
               <span className="title-line" />
-              <span>ESPRIT</span>
+              <span>{homeContent.heroTitleLine2}</span>
             </span>
           </motion.h1>
 
           <motion.div className="hero-desc-row" variants={fadeUp} custom={2}>
             <p className="hero-description">
-              <span className="hide-mobile">
-                Notitia est votre assistant de mémoire augmentée. Il enregistre, indexe et organise 
-                vos échanges grâce à l'IA locale —{' '}
-              </span>
-              pour ne plus jamais rien oublier.
+              {homeContent.heroDescription}
             </p>
           </motion.div>
 
           <motion.div className="hero-actions" variants={fadeUp} custom={3}>
             <Link to="/docs" className="btn-solais primary large">
               <span className="btn-edge left" />
-              <span className="btn-inner">Explorer la documentation</span>
+              <span className="btn-inner">{homeContent.heroPrimaryButton}</span>
+              <span className="btn-edge right" />
+            </Link>
+            <Link to="/customize" className="btn-solais primary large">
+              <span className="btn-edge left" />
+              <span className="btn-inner">{homeContent.heroSecondaryButton}</span>
               <span className="btn-edge right" />
             </Link>
           </motion.div>
@@ -381,7 +384,7 @@ export default function Home() {
             ].map((adv, i) => (
               <motion.div key={i} className="advantage-card" variants={fadeUp} custom={i + 4}>
                 <div className="adv-header">
-                  <BlinkDot color="#9060ff" />
+                  <BlinkDot color="var(--brand-ui-2)" />
                   <h4>{adv.title}</h4>
                 </div>
                 <p>{adv.desc}</p>

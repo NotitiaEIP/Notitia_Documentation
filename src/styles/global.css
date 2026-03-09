@@ -34,6 +34,15 @@
   --bg-sidebar: #0c0c24;
   --bg-code: #1a1a3a;
 
+  /* Landing-specific UI tones */
+  --surface-solid: #050520;
+  --surface-deep: #0a0a2a;
+  --surface-deeper: #0e0e35;
+  --brand-ui-1: #6a3de8;
+  --brand-ui-2: #9060ff;
+  --brand-ui-3: #ff40c0;
+  --hero-tag-text: #050520;
+
   /* Text colors */
   --text-primary: #f0f0ff;
   --text-secondary: #a0a0cc;

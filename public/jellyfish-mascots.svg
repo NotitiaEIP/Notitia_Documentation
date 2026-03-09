@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a2d8a"/>
+      <stop offset="50%" stop-color="#6a3de8"/>
+      <stop offset="100%" stop-color="#8a5cf5"/>
+    </linearGradient>
+    <linearGradient id="tentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6a3de8"/>
+      <stop offset="100%" stop-color="#d040c0"/>
+    </linearGradient>
+    <radialGradient id="eyeGrad" cx="50%" cy="40%">
+      <stop offset="0%" stop-color="#80dfff"/>
+      <stop offset="70%" stop-color="#40b0e0"/>
+      <stop offset="100%" stop-color="#2090cc"/>
+    </radialGradient>
+    <radialGradient id="shine" cx="35%" cy="30%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.5)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+  <!-- Body (bell) -->
+  <ellipse cx="100" cy="80" rx="65" ry="60" fill="url(#bodyGrad)" stroke="#3a1d7a" stroke-width="3"/>
+  <!-- Body shine -->
+  <ellipse cx="85" cy="55" rx="20" ry="12" fill="url(#shine)" opacity="0.6"/>
+  <ellipse cx="120" cy="50" rx="10" ry="7" fill="url(#shine)" opacity="0.4"/>
+  <!-- Top ring -->
+  <ellipse cx="100" cy="42" rx="22" ry="8" fill="none" stroke="#c060ff" stroke-width="2.5" opacity="0.6"/>
+  <!-- Eyes -->
+  <ellipse cx="78" cy="82" rx="14" ry="15" fill="url(#eyeGrad)"/>
+  <ellipse cx="122" cy="82" rx="14" ry="15" fill="url(#eyeGrad)"/>
+  <!-- Pupils -->
+  <circle cx="80" cy="80" r="5" fill="#1a1a3a"/>
+  <circle cx="124" cy="80" r="5" fill="#1a1a3a"/>
+  <!-- Eye highlights -->
+  <circle cx="83" cy="77" r="2.5" fill="white" opacity="0.9"/>
+  <circle cx="127" cy="77" r="2.5" fill="white" opacity="0.9"/>
+  <!-- Smile -->
+  <path d="M 90 95 Q 100 105 110 95" stroke="#40b0e0" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Tentacles -->
+  <path d="M 50 130 Q 40 170 35 200 Q 32 215 40 220" stroke="url(#tentGrad)" stroke-width="7" fill="none" stroke-linecap="round">
+    <animate attributeName="d" dur="3s" repeatCount="indefinite" values="M 50 130 Q 40 170 35 200 Q 32 215 40 220;M 50 130 Q 35 165 30 195 Q 25 215 35 225;M 50 130 Q 40 170 35 200 Q 32 215 40 220"/>
+  </path>
+  <path d="M 70 135 Q 65 175 60 210 Q 57 225 65 230" stroke="url(#tentGrad)" stroke-width="6" fill="none" stroke-linecap="round">
+    <animate attributeName="d" dur="3.5s" repeatCount="indefinite" values="M 70 135 Q 65 175 60 210 Q 57 225 65 230;M 70 135 Q 60 170 55 205 Q 50 225 60 235;M 70 135 Q 65 175 60 210 Q 57 225 65 230"/>
+  </path>
+  <path d="M 90 138 Q 88 178 85 215 Q 83 230 90 235" stroke="url(#tentGrad)" stroke-width="5.5" fill="none" stroke-linecap="round">
+    <animate attributeName="d" dur="4s" repeatCount="indefinite" values="M 90 138 Q 88 178 85 215 Q 83 230 90 235;M 90 138 Q 92 175 95 210 Q 97 230 90 235;M 90 138 Q 88 178 85 215 Q 83 230 90 235"/>
+  </path>
+  <path d="M 110 138 Q 112 178 115 215 Q 117 230 110 235" stroke="url(#tentGrad)" stroke-width="5.5" fill="none" stroke-linecap="round">
+    <animate attributeName="d" dur="3.8s" repeatCount="indefinite" values="M 110 138 Q 112 178 115 215 Q 117 230 110 235;M 110 138 Q 108 175 105 210 Q 103 230 110 235;M 110 138 Q 112 178 115 215 Q 117 230 110 235"/>
+  </path>
+  <path d="M 130 135 Q 135 175 140 210 Q 143 225 135 230" stroke="url(#tentGrad)" stroke-width="6" fill="none" stroke-linecap="round">
+    <animate attributeName="d" dur="3.3s" repeatCount="indefinite" values="M 130 135 Q 135 175 140 210 Q 143 225 135 230;M 130 135 Q 140 170 145 205 Q 150 225 140 235;M 130 135 Q 135 175 140 210 Q 143 225 135 230"/>
+  </path>
+  <path d="M 150 130 Q 160 170 165 200 Q 168 215 160 220" stroke="url(#tentGrad)" stroke-width="7" fill="none" stroke-linecap="round">
+    <animate attributeName="d" dur="2.8s" repeatCount="indefinite" values="M 150 130 Q 160 170 165 200 Q 168 215 160 220;M 150 130 Q 165 165 170 195 Q 175 215 165 225;M 150 130 Q 160 170 165 200 Q 168 215 160 220"/>
+  </path>
+</svg>

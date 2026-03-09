@@ -52,9 +52,7 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <>
-              <Link to="/">Accueil</Link>
-            </>
+            <Link to="/">Accueil</Link>
           )}
           <Link
             to="/docs"
@@ -62,11 +60,17 @@ export default function Navbar() {
           >
             Documentation
           </Link>
+          <Link
+            to="/customize"
+            className={location.pathname.startsWith('/customize') ? 'active' : ''}
+          >
+            Personnaliser
+          </Link>
           <a href="https://github.com" target="_blank" rel="noopener noreferrer">
             GitHub
           </a>
           <Link to="/docs" className="navbar-cta">
-            Démarrer
+            Démarrer{' '}
             <span className="cta-arrow">→</span>
           </Link>
         </div>

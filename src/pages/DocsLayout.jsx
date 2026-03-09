@@ -2,11 +2,26 @@ import { useState } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { docsConfig } from '../docs/config'
 import { HiChevronDown, HiChevronRight, HiMenu, HiX } from 'react-icons/hi'
+import { loadCustomDocs, loadCustomFiles } from '../utils/contentCustomization'
+import DocChatbot from '../components/DocChatbot'
 import './DocsLayout.css'
 
 export default function DocsLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
+  const customDocs = loadCustomDocs()
+  const customFiles = loadCustomFiles()
+
+  const dynamicSections = [
+    ...(customDocs.length
+      ? [{ title: 'Pages personnalisées', items: customDocs.map((doc) => ({ title: doc.title, slug: doc.slug })) }]
+      : []),
+    ...(customFiles.length
+      ? [{ title: 'Fichiers', items: [{ title: `Bibliothèque (${customFiles.length})`, slug: 'files-library' }] }]
+      : []),
+  ]
+
+  const sections = [...docsConfig.sidebar, ...dynamicSections]
 
   return (
     <div className="docs-layout">
@@ -21,7 +36,7 @@ export default function DocsLayout() {
           <span className="docs-version">v0.1.0</span>
         </div>
         <nav className="docs-nav">
-          {docsConfig.sidebar.map((section, i) => (
+          {sections.map((section, i) => (
             <SidebarSection key={i} section={section} currentPath={location.pathname} onNavigate={() => setSidebarOpen(false)} />
           ))}
         </nav>
@@ -30,6 +45,8 @@ export default function DocsLayout() {
       <div className="docs-content">
         <Outlet />
       </div>
+
+      <DocChatbot />
     </div>
   )
 }

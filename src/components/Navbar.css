@@ -38,7 +38,7 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #6a3de8, #9060ff, #ff40c0);
+  background: linear-gradient(135deg, var(--brand-ui-1), var(--brand-ui-2), var(--brand-ui-3));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,7 +89,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: #6a3de8;
+  background: var(--brand-ui-1);
   border-radius: 1px;
 }
 
@@ -98,7 +98,7 @@
   align-items: center;
   gap: 6px;
   padding: 7px 18px !important;
-  background: #6a3de8 !important;
+  background: var(--brand-ui-1) !important;
   color: white !important;
   font-weight: 600 !important;
   font-size: 0.82rem !important;
