@@ -20,6 +20,27 @@ export const docsConfig = {
       ],
     },
     {
+      title: 'Guide Utilisateur',
+      items: [
+        { title: 'Prise en main', slug: 'guide-utilisateur' },
+        { title: 'Capture Vocale', slug: 'capture-vocale' },
+        { title: 'Historique & Recherche', slug: 'historique-recherche' },
+        { title: 'Assistant IA & Mind Map', slug: 'assistant-mindmap' },
+        { title: 'Réunions & NFC', slug: 'reunions-nfc' },
+        { title: 'Profil & FAQ', slug: 'profil-faq' },
+      ],
+    },
+    {
+      title: 'Documentation Technique',
+      items: [
+        { title: 'Architecture', slug: 'dev-architecture' },
+        { title: 'Modèles de données', slug: 'dev-modeles' },
+        { title: 'Services', slug: 'dev-services' },
+        { title: 'UI & Navigation', slug: 'dev-ui-navigation' },
+        { title: 'Installation Dev', slug: 'dev-installation' },
+      ],
+    },
+    {
       title: 'Software',
       items: [
         { title: 'Application Mobile', slug: 'mobile-app' },
