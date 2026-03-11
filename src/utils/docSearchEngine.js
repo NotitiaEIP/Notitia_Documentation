@@ -27,6 +27,8 @@ const STOP_WORDS = new Set([
   'tout','tres','bien','aussi','entre','dont','comme','leur','apres','meme',
   'cest','veut','veux','dire','savoir','parle','dites','moi','toi','lui',
   'eux','cela','ceci','voici','voila','cquoi','quoi','cest',
+  'quel','quels','quelle','quelles','comment','pourquoi','combien',
+  'quand','quel','lesquels','lesquelles','lequel','laquelle',
 ])
 
 // ── General overview query detection ──
@@ -37,22 +39,34 @@ const OVERVIEW_ROOTS = [
 
 function isOverviewQuery(tokens) {
   if (tokens.length === 0 || tokens.length > 3) return false
-  // At least one token must fuzzy-match an overview root
-  const hasOverviewWord = tokens.some((t) =>
+  // ALL tokens must fuzzy-match an overview root — if any token is a specific
+  // topic word (e.g. "fonctionnalite", "architecture"), it's NOT an overview query
+  return tokens.every((t) =>
     OVERVIEW_ROOTS.some((r) => r.startsWith(t) || t.startsWith(r) || levenClose(t, r)),
   )
-  return hasOverviewWord
 }
 
 function levenClose(a, b) {
   if (Math.abs(a.length - b.length) > 2) return false
-  let diff = 0
-  const len = Math.max(a.length, b.length)
-  for (let i = 0; i < len; i++) {
-    if (a[i] !== b[i]) diff++
-    if (diff > 2) return false
+  // True Levenshtein distance (handles insertions, not just substitutions)
+  const la = a.length, lb = b.length
+  if (la === 0) return lb <= 2
+  if (lb === 0) return la <= 2
+  const prev = Array.from({ length: lb + 1 }, (_, i) => i)
+  for (let i = 1; i <= la; i++) {
+    const curr = [i]
+    for (let j = 1; j <= lb; j++) {
+      curr[j] = Math.min(
+        prev[j] + 1,       // deletion
+        curr[j - 1] + 1,   // insertion
+        prev[j - 1] + (a[i - 1] !== b[j - 1] ? 1 : 0), // substitution
+      )
+    }
+    // Early exit: if min in row is already > 2, no point continuing
+    if (Math.min(...curr) > 2) return false
+    prev.splice(0, prev.length, ...curr)
   }
-  return true
+  return prev[lb] <= 2
 }
 
 // ── Code block detection: skip passages that are mostly code ──
@@ -142,6 +156,12 @@ function computeScore(queryTokens, passageText) {
     for (const pt of passageTokenSet) {
       if (pt.startsWith(qt) || qt.startsWith(pt)) {
         score += 1.5
+        matchedTokens.add(qt)
+        break
+      }
+      // Fuzzy match for typos (e.g. "fonctionalite" ↔ "fonctionnalite")
+      if (pt.length > 4 && levenClose(qt, pt)) {
+        score += 1.2
         matchedTokens.add(qt)
         break
       }
@@ -357,11 +377,18 @@ export function generateAnswer(query, results) {
     }
   }
 
-  // Only use passages from the single best-scoring document
-  const bestSlug = results[0].slug
-  const topPassages = results.filter((p) => p.slug === bestSlug).slice(0, 2)
+  // For feature / multi-topic queries, gather from top results (max 3 passages)
+  // but avoid repeating the same doc section
+  const topPassages = results.slice(0, 4)
 
-  const sources = [{ slug: bestSlug, title: results[0].docTitle }]
+  const sources = []
+  const seenSlugs = new Set()
+  for (const p of topPassages) {
+    if (!seenSlugs.has(p.slug)) {
+      seenSlugs.add(p.slug)
+      sources.push({ slug: p.slug, title: p.docTitle })
+    }
+  }
 
   const parts = []
   const seenHeadings = new Set()
