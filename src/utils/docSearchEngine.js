@@ -15,7 +15,7 @@ const markdownModules = import.meta.glob('../docs/*.md', {
   eager: true,
 })
 
-// ── Stop words (FR + EN + question words) ──
+// ── Stop words (FR + EN) ──
 const STOP_WORDS = new Set([
   'le','la','les','un','une','des','du','de','et','en','est','que','qui',
   'dans','pour','par','sur','au','aux','avec','ce','cette','ces','il','elle',
@@ -23,12 +23,27 @@ const STOP_WORDS = new Set([
   'mais','donc','car','ni','si','je','tu','mon','ma','mes','ton','ta','tes',
   'the','a','an','is','are','was','be','to','of','and','in','it','for','on',
   'with','as','at','by','this','that','from','or','not','also','but','can',
-  'has','been','have','do','does','did','être','avoir','fait','sont','été',
-  'tout','très','bien','aussi','entre','dont','comme','leur','après','même',
-  'quand','où','ici','là','cest','quoi','comment','pourquoi','veut','veux',
-  'dire','savoir','parle','dites','quels','quelles','quel','quelle','moi',
-  'toi','lui','nous','vous','eux','cela','ceci','voici','voilà',
+  'has','been','have','do','does','did','etre','avoir','fait','sont','ete',
+  'tout','tres','bien','aussi','entre','dont','comme','leur','apres','meme',
+  'cest','veut','veux','dire','savoir','parle','dites','moi','toi','lui',
+  'eux','cela','ceci','voici','voila','cquoi','quoi','cest',
 ])
+
+// ── General overview query detection ──
+// Tokens that alone signal "tell me about the project/this topic" intent
+const OVERVIEW_SIGNALS = new Set([
+  'projet','notitia','presentation','introduction','overview',
+  'presentez','cest','keskeske','keseke',
+])
+
+function isOverviewQuery(tokens) {
+  // Short query (1-2 tokens) whose only tokens are generic overview words
+  return (
+    tokens.length >= 1 &&
+    tokens.length <= 2 &&
+    tokens.every((t) => OVERVIEW_SIGNALS.has(t))
+  )
+}
 
 function tokenize(text) {
   return text
@@ -288,16 +303,23 @@ export function searchDocs(query, maxResults = 5) {
   const queryTokens = tokenize(query)
   if (!queryTokens.length) return []
 
+  const overview = isOverviewQuery(queryTokens)
+
   return _passages
     .filter((p) => !isNavigationPassage(p))
     .map((p) => {
-      let score = computeScore(queryTokens, p.textPlain)
-      // Boost passages whose doc title or heading directly matches query tokens
-      const titleTokens = tokenize(p.docTitle + ' ' + p.heading)
-      const titleMatches = queryTokens.filter((qt) =>
-        titleTokens.some((tt) => tt === qt || tt.startsWith(qt) || qt.startsWith(tt)),
-      ).length
-      if (titleMatches > 0) score *= 1 + titleMatches * 0.4
+      let score = overview
+        ? (p.slug === 'introduction' ? 100 : 0)  // force introduction for generic queries
+        : computeScore(queryTokens, p.textPlain)
+
+      if (!overview) {
+        // Boost passages whose doc title or heading directly matches query tokens
+        const titleTokens = tokenize(p.docTitle + ' ' + p.heading)
+        const titleMatches = queryTokens.filter((qt) =>
+          titleTokens.some((tt) => tt === qt || tt.startsWith(qt) || qt.startsWith(tt)),
+        ).length
+        if (titleMatches > 0) score *= 1 + titleMatches * 0.4
+      }
       return { ...p, score }
     })
     .filter((p) => p.score > 0)
