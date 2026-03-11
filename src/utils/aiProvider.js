@@ -1,12 +1,13 @@
 /**
  * Meduza AI Provider — Google Gemini 2.5 Flash Lite
+ * API key is read from VITE_GEMINI_API_KEY in .env (never committed)
  */
 
-const GEMINI_API_KEY = 'AIzaSyC4JXkfK5lEDG89DzdQV_REgzL7fQ7odF8'
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent'
 
 export function hasApiKey() {
-  return true
+  return !!GEMINI_API_KEY
 }
 
 /**
