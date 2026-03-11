@@ -319,46 +319,30 @@ export function generateAnswer(query, results) {
     }
   }
 
-  // Deduplicate sources, best doc first
-  const sources = [
-    ...new Map(results.map((r) => [r.slug, { slug: r.slug, title: r.docTitle }])).values(),
-  ]
+  // Only use passages from the single best-scoring document
+  const bestSlug = results[0].slug
+  const topPassages = results.filter((p) => p.slug === bestSlug).slice(0, 2)
+
+  const sources = [{ slug: bestSlug, title: results[0].docTitle }]
 
   const parts = []
   const seenHeadings = new Set()
 
-  // Process top 4 passages directly (don't restrict to one doc)
-  for (const passage of results.slice(0, 4)) {
-    const headingKey = `${passage.slug}::${passage.heading}`
+  for (const passage of topPassages) {
+    const headingKey = passage.heading
     if (seenHeadings.has(headingKey)) continue
     seenHeadings.add(headingKey)
 
-    // Convert passage markdown to chat-friendly text
     let content = passageToChat(passage.text)
-
-    // Fallback: use plain text if passageToChat gave nothing
-    if (!content || content.length < 15) {
-      content = passage.textPlain.slice(0, 400)
-    }
+    if (!content || content.length < 15) content = passage.textPlain.slice(0, 400)
     if (!content || content.length < 10) continue
 
-    // Add section label only if different from doc title
-    const label =
-      passage.heading && passage.heading !== passage.docTitle
-        ? `**${passage.heading}**`
-        : null
-
-    parts.push(label ? `${label}\n${content}` : content)
+    parts.push(content)
   }
 
-  // No content found at all — raw fallback
   if (parts.length === 0) {
     parts.push(results[0].textPlain.slice(0, 500))
   }
-
-  // "En savoir plus" link to the best matching page
-  const primary = sources[0]
-  parts.push(`**En savoir plus** → [${primary.title}](/docs/${primary.slug})`)
 
   return {
     text: parts.filter(Boolean).join('\n\n'),

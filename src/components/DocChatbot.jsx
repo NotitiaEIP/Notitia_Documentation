@@ -94,9 +94,16 @@ export default function DocChatbot() {
             { role: 'assistant', text: '⏱️ Limite de requêtes atteinte. Réessaie dans une minute.', sources: [] },
           ])
         } else {
-          // Fallback silently to TF-IDF
+          // Gemini unavailable — show TF-IDF result with a notice
           const answer = generateAnswer(query, results)
-          setMessages((prev) => [...prev, { role: 'assistant', text: answer.text, sources: answer.sources }])
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              text: `⚠️ *Gemini indisponible* \u2014 réponse locale :\n\n${answer.text}`,
+              sources: answer.sources,
+            },
+          ])
         }
       }
 
