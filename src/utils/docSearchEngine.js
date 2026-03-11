@@ -65,7 +65,14 @@ function splitIntoPassages(markdown, slug, docTitle) {
         docTitle: docTitle || slug,
         heading: currentHeading,
         text,
-        textPlain: text.replace(/[#*_`\[\]\(\)>|\\-]/g, ' ').replace(/\s+/g, ' ').trim(),
+        textPlain: text
+          .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')  // images → alt text
+          .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')    // links → link text only
+          .replace(/[#*_`>|\\\-]/g, ' ')               // remaining markdown
+          .replace(/https?:\/\/\S+/g, '')              // bare URLs
+          .replace(/\/docs\/[\w-]+/g, '')              // internal paths
+          .replace(/\s+/g, ' ')
+          .trim(),
       })
     }
     currentLines = []
