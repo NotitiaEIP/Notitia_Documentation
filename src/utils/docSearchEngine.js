@@ -233,6 +233,32 @@ function passageToChat(rawText) {
   return output.join('\n').replace(/\n{3,}/g, '\n\n').trim()
 }
 
+// ── Navigation-section blacklist ──
+const NAV_HEADINGS = new Set([
+  'liens rapides', 'quick links', 'voir aussi', 'see also',
+  'sommaire', 'table des matieres', 'navigation', 'menu',
+  'gestion de projet', 'project management',
+])
+
+function isNavigationPassage(p) {
+  const h = p.heading
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+  if (NAV_HEADINGS.has(h)) return true
+
+  // If >60% of non-empty lines are bullet links ( - [...] or ▸ ... — )
+  const lines = p.text.split('\n').filter((l) => l.trim())
+  if (lines.length === 0) return false
+  const navLines = lines.filter((l) =>
+    /^[-*+]\s*\[/.test(l.trim()) ||
+    /^[▸►•]\s*.+—/.test(l.trim()) ||
+    /^-\s+.+\u2014/.test(l.trim())
+  )
+  return navLines.length / lines.length > 0.55
+}
+
 // ── Public API ──
 
 let _passages = []
@@ -263,6 +289,7 @@ export function searchDocs(query, maxResults = 5) {
   if (!queryTokens.length) return []
 
   return _passages
+    .filter((p) => !isNavigationPassage(p))
     .map((p) => {
       let score = computeScore(queryTokens, p.textPlain)
       // Boost passages whose doc title or heading directly matches query tokens
