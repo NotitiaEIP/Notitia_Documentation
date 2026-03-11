@@ -2,7 +2,7 @@
  * Meduza AI Provider — Google Gemini 2.5 Flash Lite
  */
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || ''
+const GEMINI_API_KEY = import.meta.env.VITE_NOTITIA_API || ''
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent'
 
 export function hasApiKey() {

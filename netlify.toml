@@ -1,0 +1,3 @@
+[build]
+  command = "VITE_NOTITIA_API=$Notitia_API npm run build"
+  publish = "dist"
