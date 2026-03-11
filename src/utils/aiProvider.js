@@ -1,9 +1,9 @@
 /**
- * Meduza AI Provider — Google Gemini 1.5 Flash
+ * Meduza AI Provider — Google Gemini 2.5 Flash Lite
  */
 
-const GEMINI_API_KEY = 'AIzaSyA9VB4-x2G1pX6yOR8-37I-i-NUwd2Pelo'
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+const GEMINI_API_KEY = 'AIzaSyC4JXkfK5lEDG89DzdQV_REgzL7fQ7odF8'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent'
 
 export function hasApiKey() {
   return true
