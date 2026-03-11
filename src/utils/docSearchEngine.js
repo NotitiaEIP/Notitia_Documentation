@@ -30,19 +30,35 @@ const STOP_WORDS = new Set([
 ])
 
 // ── General overview query detection ──
-// Tokens that alone signal "tell me about the project/this topic" intent
-const OVERVIEW_SIGNALS = new Set([
-  'projet','notitia','presentation','introduction','overview',
-  'presentez','cest','keskeske','keseke',
-])
+const OVERVIEW_ROOTS = [
+  'projet','notitia','noticia','presentation','introduction','overview',
+  'presentez','keskeske','keseke','appli','application',
+]
 
 function isOverviewQuery(tokens) {
-  // Short query (1-2 tokens) whose only tokens are generic overview words
-  return (
-    tokens.length >= 1 &&
-    tokens.length <= 2 &&
-    tokens.every((t) => OVERVIEW_SIGNALS.has(t))
+  if (tokens.length === 0 || tokens.length > 3) return false
+  // At least one token must fuzzy-match an overview root
+  const hasOverviewWord = tokens.some((t) =>
+    OVERVIEW_ROOTS.some((r) => r.startsWith(t) || t.startsWith(r) || levenClose(t, r)),
   )
+  return hasOverviewWord
+}
+
+function levenClose(a, b) {
+  if (Math.abs(a.length - b.length) > 2) return false
+  let diff = 0
+  const len = Math.max(a.length, b.length)
+  for (let i = 0; i < len; i++) {
+    if (a[i] !== b[i]) diff++
+    if (diff > 2) return false
+  }
+  return true
+}
+
+// ── Code block detection: skip passages that are mostly code ──
+function isCodePassage(p) {
+  const codeLines = p.text.split('\n').filter((l) => /^[│├└┌─\s]*[|/\\{}()\[\]]/.test(l) || l.trim().startsWith('`'))
+  return codeLines.length / Math.max(p.text.split('\n').length, 1) > 0.4
 }
 
 function tokenize(text) {
@@ -306,7 +322,7 @@ export function searchDocs(query, maxResults = 5) {
   const overview = isOverviewQuery(queryTokens)
 
   return _passages
-    .filter((p) => !isNavigationPassage(p))
+    .filter((p) => !isNavigationPassage(p) && !isCodePassage(p))
     .map((p) => {
       let score = overview
         ? (p.slug === 'introduction' ? 100 : 0)  // force introduction for generic queries
