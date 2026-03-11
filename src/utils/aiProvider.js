@@ -1,23 +1,12 @@
 /**
- * Meduza AI Provider — Google Gemini 1.5 Flash (100% free)
- * 1500 req/day · 15 RPM · no credit card
- * https://aistudio.google.com/app/apikey
+ * Meduza AI Provider — Google Gemini 1.5 Flash
  */
 
-const STORAGE_KEY = 'notitia_gemini_key'
+const GEMINI_API_KEY = 'AIzaSyAf7Dpyh_x43WbTeo4vruiyRAYiuCAecik'
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
 
-export function loadApiKey() {
-  return localStorage.getItem(STORAGE_KEY) || ''
-}
-
-export function saveApiKey(key) {
-  if (key) localStorage.setItem(STORAGE_KEY, key.trim())
-  else localStorage.removeItem(STORAGE_KEY)
-}
-
 export function hasApiKey() {
-  return !!loadApiKey()
+  return true
 }
 
 /**
@@ -25,8 +14,7 @@ export function hasApiKey() {
  * Returns the generated text or throws on error.
  */
 export async function callGemini(question, passages) {
-  const apiKey = loadApiKey()
-  if (!apiKey) throw new Error('NO_KEY')
+  const apiKey = GEMINI_API_KEY
 
   // Build context from passages (max ~3000 chars to stay within limits)
   const context = passages

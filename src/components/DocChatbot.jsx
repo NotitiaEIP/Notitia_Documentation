@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { indexAllDocs, searchDocs, generateAnswer, getDocStats } from '../utils/docSearchEngine'
-import { callGemini, loadApiKey, saveApiKey, hasApiKey } from '../utils/aiProvider'
+import { callGemini, hasApiKey } from '../utils/aiProvider'
 import { HiTrash, HiX, HiPaperAirplane } from 'react-icons/hi'
-import { HiMiniDocumentText, HiMiniKey, HiMiniCpuChip } from 'react-icons/hi2'
+import { HiMiniDocumentText, HiMiniCpuChip } from 'react-icons/hi2'
 import './DocChatbot.css'
 
 const WELCOME_MESSAGE = {
@@ -18,10 +18,6 @@ export default function DocChatbot() {
   const [isTyping, setIsTyping] = useState(false)
   const [indexed, setIndexed] = useState(false)
   const [stats, setStats] = useState(null)
-  const [aiMode, setAiMode] = useState(hasApiKey()) // true = Gemini, false = TF-IDF
-  const [showSettings, setShowSettings] = useState(false)
-  const [keyInput, setKeyInput] = useState(loadApiKey())
-  const [keyError, setKeyError] = useState('')
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
   const [animDir, setAnimDir] = useState(null)
@@ -83,43 +79,30 @@ export default function DocChatbot() {
 
       const results = searchDocs(query, 5)
 
-      // Try Gemini if key is set
-      if (aiMode && hasApiKey()) {
-        try {
-          const aiText = await callGemini(query, results)
-          const sources = [...new Map(results.map((r) => [r.slug, { slug: r.slug, title: r.docTitle }])).values()]
+      // Always use Gemini
+      try {
+        const aiText = await callGemini(query, results)
+        const sources = [...new Map(results.map((r) => [r.slug, { slug: r.slug, title: r.docTitle }])).values()]
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', text: aiText, sources },
+        ])
+      } catch (err) {
+        if (err.message === 'RATE_LIMIT') {
           setMessages((prev) => [
             ...prev,
-            { role: 'assistant', text: aiText, sources },
+            { role: 'assistant', text: '⏱️ Limite de requêtes atteinte. Réessaie dans une minute.', sources: [] },
           ])
-        } catch (err) {
-          if (err.message === 'NO_KEY' || err.message === 'INVALID_KEY') {
-            setKeyError('Clé API invalide. Vérifie ta clé Gemini.')
-            setShowSettings(true)
-            // Fallback to TF-IDF
-            const answer = generateAnswer(query, results)
-            setMessages((prev) => [...prev, { role: 'assistant', text: answer.text, sources: answer.sources }])
-          } else if (err.message === 'RATE_LIMIT') {
-            setMessages((prev) => [
-              ...prev,
-              { role: 'assistant', text: '⏱️ Limite de requêtes Gemini atteinte. Réessaie dans une minute.', sources: [] },
-            ])
-          } else {
-            // Network error or other — fallback silently
-            const answer = generateAnswer(query, results)
-            setMessages((prev) => [...prev, { role: 'assistant', text: answer.text, sources: answer.sources }])
-          }
+        } else {
+          // Fallback silently to TF-IDF
+          const answer = generateAnswer(query, results)
+          setMessages((prev) => [...prev, { role: 'assistant', text: answer.text, sources: answer.sources }])
         }
-      } else {
-        // TF-IDF mode (no key)
-        await new Promise((r) => setTimeout(r, 400 + Math.random() * 400))
-        const answer = generateAnswer(query, results)
-        setMessages((prev) => [...prev, { role: 'assistant', text: answer.text, sources: answer.sources }])
       }
 
       setIsTyping(false)
     },
-    [input, isTyping, aiMode],
+    [input, isTyping],
   )
 
   const handleKeyDown = (e) => {
@@ -132,20 +115,6 @@ export default function DocChatbot() {
   const handleClear = () => {
     setMessages([WELCOME_MESSAGE])
     setInput('')
-  }
-
-  const handleSaveKey = () => {
-    saveApiKey(keyInput)
-    setAiMode(!!keyInput.trim())
-    setKeyError('')
-    setShowSettings(false)
-  }
-
-  const handleRemoveKey = () => {
-    saveApiKey('')
-    setKeyInput('')
-    setAiMode(false)
-    setShowSettings(false)
   }
 
   // Simple markdown-ish renderer for chat messages
@@ -235,23 +204,13 @@ export default function DocChatbot() {
             />
             <div>
               <h3>Meduza</h3>
-              <span className={`chatbot-status ${aiMode ? 'ai-on' : ''}`}>
-                {aiMode
-                  ? <><HiMiniCpuChip size={11} style={{ marginRight: 3, verticalAlign: 'middle' }} />Gemini AI · {stats?.totalDocs || 0} docs</>
-                  : indexed
-                    ? `TF-IDF · ${stats?.totalDocs || 0} docs`
-                    : 'Chargement…'}
+              <span className="chatbot-status ai-on">
+                <HiMiniCpuChip size={11} style={{ marginRight: 3, verticalAlign: 'middle' }} />
+                Gemini AI · {stats?.totalDocs || 0} docs
               </span>
             </div>
           </div>
           <div className="chatbot-header-actions">
-            <button
-              onClick={() => setShowSettings((v) => !v)}
-              title={aiMode ? 'Gemini configuré' : 'Configurer Gemini AI'}
-              className={`icon-btn ${aiMode ? 'key-btn-on' : 'key-btn-off'}`}
-            >
-              <HiMiniKey size={17} />
-            </button>
             <button onClick={handleClear} title="Effacer la conversation" className="icon-btn">
               <HiTrash size={17} />
             </button>
@@ -260,34 +219,6 @@ export default function DocChatbot() {
             </button>
           </div>
         </div>
-
-        {/* ── API Key settings panel ── */}
-        {showSettings && (
-          <div className="chatbot-settings">
-            <p className="settings-title">
-              <HiMiniCpuChip size={14} /> Gemini API Key
-              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" className="settings-link">
-                Obtenir une clé gratuite →
-              </a>
-            </p>
-            <div className="settings-row">
-              <input
-                type="password"
-                value={keyInput}
-                onChange={(e) => { setKeyInput(e.target.value); setKeyError('') }}
-                placeholder="AIza..."
-                className="settings-key-input"
-                onKeyDown={(e) => e.key === 'Enter' && handleSaveKey()}
-              />
-              <button onClick={handleSaveKey} className="settings-save-btn">Sauver</button>
-            </div>
-            {keyError && <p className="settings-error">{keyError}</p>}
-            {aiMode && (
-              <button onClick={handleRemoveKey} className="settings-remove-btn">Supprimer la clé</button>
-            )}
-            <p className="settings-note">100% gratuit · 1500 req/jour · aucune CB requise</p>
-          </div>
-        )}
 
         {/* Messages */}
         <div className="chatbot-messages">
