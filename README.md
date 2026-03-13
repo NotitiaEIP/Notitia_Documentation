@@ -14,3 +14,22 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Formulaire de pitch (Formspree)
+
+La page `/pitch` envoie le formulaire en `POST` JSON vers l'URL Formspree définie dans:
+
+- `VITE_FORMSPREE_ENDPOINT`
+
+Configuration rapide:
+
+1. Créer un formulaire sur Formspree
+2. Copier `.env.example` vers `.env`
+3. Remplacer l'URL par votre endpoint Formspree, par exemple `https://formspree.io/f/xzzabcde`
+4. Redémarrer le serveur Vite (`npm run dev`)
+
+Consulter les soumissions:
+
+1. Ouvrir le dashboard Formspree
+2. Sélectionner votre formulaire
+3. Voir les entrées reçues, les emails, et les champs transmis

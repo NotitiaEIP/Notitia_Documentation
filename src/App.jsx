@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import DocsLayout from './pages/DocsLayout'
 import DocPage from './pages/DocPage'
 import ThemeEditor from './pages/ThemeEditor'
+import PitchForm from './pages/PitchForm'
 import { docsConfig } from './docs/config'
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="customize" element={<ThemeEditor />} />
+        <Route path="pitch" element={<PitchForm />} />
         <Route path="docs" element={<DocsLayout />}>
           <Route index element={<DocPage slug={docsConfig.defaultDoc} />} />
           <Route path=":slug" element={<DocPage />} />

@@ -1,0 +1,143 @@
+.pitch-page {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  background: radial-gradient(circle at top, rgba(144, 1, 245, 0.1), transparent 50%), var(--surface-solid);
+}
+
+.pitch-card {
+  width: min(760px, 100%);
+  background: rgba(15, 15, 42, 0.75);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.pitch-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--brand-ui-1), var(--brand-ui-2));
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.pitch-card h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin-bottom: 0.6rem;
+}
+
+.pitch-card > p {
+  color: var(--text-secondary);
+  margin-bottom: 1.4rem;
+}
+
+.pitch-form {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.pitch-form label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.pitch-form input,
+.pitch-form select,
+.pitch-form textarea {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font: inherit;
+  padding: 0.62rem 0.75rem;
+}
+
+.pitch-form textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.pitch-form input:focus,
+.pitch-form select:focus,
+.pitch-form textarea:focus {
+  outline: none;
+  border-color: var(--brand-ui-2);
+}
+
+.consent-row {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.6rem;
+}
+
+.consent-row input {
+  width: 16px;
+  height: 16px;
+  margin-top: 0.12rem;
+}
+
+.consent-row span {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.pitch-submit-btn {
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--brand-ui-1), var(--brand-ui-3));
+  color: #fff;
+  font-weight: 700;
+  padding: 0.78rem 1rem;
+  transition: var(--transition);
+}
+
+.pitch-submit-btn:hover {
+  filter: brightness(1.1);
+}
+
+.pitch-submit-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.pitch-success {
+  margin-top: 0.9rem;
+  border: 1px solid rgba(144, 1, 245, 0.35);
+  background: rgba(144, 1, 245, 0.12);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+}
+
+.pitch-error {
+  margin-top: 0.9rem;
+  border: 1px solid rgba(255, 1, 120, 0.35);
+  background: rgba(255, 1, 120, 0.12);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem;
+}
+
+.pitch-back-link {
+  margin-top: 1rem;
+  display: inline-block;
+  color: var(--text-accent);
+}
+
+@media (max-width: 700px) {
+  .pitch-card {
+    padding: 1.2rem;
+  }
+}

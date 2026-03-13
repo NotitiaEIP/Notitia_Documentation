@@ -16,6 +16,7 @@ import {
 } from 'react-icons/hi'
 import JellyfishScene from '../components/JellyfishScene'
 import { loadHomeContent } from '../utils/contentCustomization'
+import notitiaLogo from '../../assets/notitia-logo.png'
 import './Home.css'
 
 /* ─── loading screen ─── */
@@ -57,7 +58,7 @@ function LoadingScreen({ onComplete }) {
         ))}
       </div>
       <div className="loading-center">
-        <div className="loading-logo">N</div>
+        <img src={notitiaLogo} alt="Notitia" className="loading-logo-image" />
         <div className="loading-text-container">
           <div className="loading-line">Votre mémoire augmentée.</div>
           <div className="loading-line">Propulsée par l'IA.</div>
@@ -412,7 +413,6 @@ export default function Home() {
               <span>Usage</span>
             </span>
           </motion.h2>
-
           <div className="use-cases-grid">
             {useCases.map((uc, i) => (
               <motion.div key={i} className="use-case-card" variants={fadeUp} custom={i + 2}>
@@ -455,9 +455,9 @@ export default function Home() {
                 tout retenir — en toute confidentialité.
               </motion.p>
               <motion.div variants={fadeUp} custom={2}>
-                <Link to="/docs" className="btn-solais primary large">
+                <Link to="/pitch" className="btn-solais primary large">
                   <span className="btn-edge left" />
-                  <span className="btn-inner">Explorer la documentation</span>
+                  <span className="btn-inner">Accéder au formulaire de démo</span>
                   <span className="btn-edge right" />
                 </Link>
               </motion.div>
@@ -495,7 +495,7 @@ export default function Home() {
       </section>
 
       <div className="big-logo-container">
-        <span className="big-logo-text">NOTITIA</span>
+        <img src={notitiaLogo} alt="Notitia" className="big-logo-image" />
       </div>
     </div>
   )

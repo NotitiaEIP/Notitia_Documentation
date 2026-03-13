@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { FaGithub, FaDiscord } from 'react-icons/fa'
+import notitiaLogo from '../../assets/notitia-logo.png'
 import './Footer.css'
 
 export default function Footer() {
@@ -9,8 +10,7 @@ export default function Footer() {
       <div className="footer-inner">
         <div className="footer-brand">
           <div className="footer-logo">
-            <div className="logo-icon">N</div>
-            <span className="logo-text">Notitia</span>
+            <img src={notitiaLogo} alt="Notitia" className="footer-logo-image" />
           </div>
           <p className="footer-tagline">
             Libérez votre esprit, nous gardons le reste.

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { HiMenuAlt3, HiX } from 'react-icons/hi'
+import notitiaLogo from '../../assets/notitia-logo.png'
 import './Navbar.css'
 
 export default function Navbar() {
@@ -31,8 +32,7 @@ export default function Navbar() {
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="navbar-inner">
         <Link to="/" className="navbar-logo">
-          <div className="logo-icon">N</div>
-          <span className="logo-text">Notitia</span>
+          <img src={notitiaLogo} alt="Notitia" className="navbar-logo-image" />
         </Link>
 
         <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
