@@ -2,7 +2,7 @@
 
 Version 1 du 24 octobre 2026, proposée par Clément, validée par l'équipe dans la PR qui ajoute ce fichier.
 
-Ce cadre fixe ce qui ne change pas d'ici le Greenlight de juillet 2027. Le travail de chaque semaine vit dans le [GitHub Project](https://github.com/orgs/NotitiaEIP/projects), et chaque choix technique dans une fiche de décision (ADR). Si une tâche contredit ce cadre, c'est la tâche qu'on corrige, ou alors on change le cadre selon la règle de la partie 9.
+Ce cadre fixe ce qui ne change pas d'ici le Greenlight de juillet 2027. Le travail de chaque semaine vit dans le [GitHub Project](https://github.com/orgs/NotitiaEIP/projects/10), et chaque choix technique dans une fiche de décision (ADR). Si une tâche contredit ce cadre, c'est la tâche qu'on corrige, ou alors on change le cadre selon la règle de la partie 9.
 
 ## 1. Notitia en une phrase
 
